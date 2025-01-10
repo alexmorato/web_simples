@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizadores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            margin: 10px 0;
+        }
+        #timer-container {
+            display: none;
+            margin-top: 20px;
+        }
+        #timer-image {
+            height: 40vh;
+            width: auto;
+        }
+        .timer-info {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .remaining-time {
+            font-size: 24px;
+            color: #d9534f;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        .controls button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="increaseTextSize()">A+</button>
+        <button onclick="decreaseTextSize()">A-</button>
+        <button onclick="toggleFullScreen()">⛶</button>
+    </div>
+
+    <div id="input-container">
+    <h1>Configurador de Temporizadores</h1>
+        <textarea id="json-input">[
+	{
+		"endTime": "08:00",
+		"text": "🍪 Desayuno 🥛",
+		"imageUrl": "https://img.freepik.com/foto-gratis/nina-desayunando_23-2148179420.jpg"
+	},
+	{
+		"endTime": "08:15",
+		"text": "👗 Vestirse 👟",
+		"imageUrl": "https://img.freepik.com/fotos-premium/conjunto-ropa-trajes-bebes-color-purpura-claro_1173099-17699.jpg"
+	},
+	{
+		"endTime": "20:00",
+		"text": "💇 Peinarse 📱",
+		"imageUrl": "https://img.freepik.com/fotos-premium/nina-feliz-peinandose-concepto-belleza-e-infancia-chica-sobre-fondo-rosa-aislado-peinando-su-cabello-peine-rosa-su-cabello-rubio_170532-3411.jpg"
+	}
+]</textarea><br>
+        <button onclick="startTimers()">Iniciar Temporizadores</button>
+    </div>
+
+    <div id="timer-container">
+        <img id="timer-image" alt="Imagen del temporizador">
+        <div class="timer-info" id="timer-text"></div>
+        <div class="remaining-time" id="timer-remaining"></div>
+        <button onclick="skipTimer()">Acabe Antes</button>
+    </div>
+
+    <script>
+        let timers = [];
+        let currentTimerIndex = 0;
+        let countdownInterval;
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake Lock activado');
+                wakeLock.addEventListener('release', () => {
+                    console.log('Wake Lock liberado');
+                });
+            } catch (err) {
+                console.error(`${err.name}, ${err.message}`);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+                console.log('Wake Lock liberado manualmente');
+            }
+        }
+
+        function startTimers() {
+            try {
+                const jsonInput = document.getElementById('json-input').value;
+                timers = JSON.parse(jsonInput);
+
+                if (!Array.isArray(timers) || timers.length === 0) {
+                    alert('El JSON debe ser un array con al menos un temporizador.');
+                    return;
+                }
+
+                currentTimerIndex = 0;
+                document.getElementById('input-container').style.display = 'none';
+                requestWakeLock(); // Evitar que la pantalla se apague
+                showTimer();
+            } catch (error) {
+                alert('Error en el formato del JSON. Verifica la sintaxis.');
+            }
+        }
+
+        function calculateRemainingTime(targetTime) {
+            const now = new Date();
+            const [targetHours, targetMinutes] = targetTime.split(':').map(Number);
+
+            const targetDate = new Date();
+            targetDate.setHours(targetHours, targetMinutes, 0, 0);
+
+            if (targetDate <= now) {
+                targetDate.setDate(targetDate.getDate() + 1); // Pasar al siguiente día si la hora ya pasó
+            }
+
+            return targetDate.getTime() - now.getTime();
+        }
+
+        function showTimer() {
+            if (currentTimerIndex >= timers.length) {
+                alert('Todos los temporizadores han finalizado.');
+                releaseWakeLock(); // Liberar Wake Lock al finalizar
+                document.getElementById('timer-container').style.display = 'none';
+                return;
+            }
+
+            const timer = timers[currentTimerIndex];
+            const remainingTime = calculateRemainingTime(timer.endTime);
+
+            document.getElementById('timer-image').src = timer.imageUrl;
+            document.getElementById('timer-text').textContent = timer.text;
+            document.getElementById('timer-container').style.display = 'block';
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const remaining = calculateRemainingTime(timer.endTime);
+
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    skipTimer();
+                } else {
+                    const seconds = Math.floor((remaining / 1000) % 60);
+                    const minutes = Math.floor((remaining / (1000 * 60)) % 60);
+                    const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+
+                    let timeString = "";
+                    if (hours > 0) {
+                        timeString += `${hours}h `;
+                    }
+                    timeString += `${minutes}m ${seconds}s`;
+
+                    document.getElementById('timer-remaining').textContent = timeString;
+                }
+            }, 1000);
+        }
+
+        function skipTimer() {
+            clearInterval(countdownInterval);
+            currentTimerIndex++;
+            showTimer();
+        }
+
+        function increaseTextSize() {
+            const element = document.getElementById('timer-remaining');
+            const currentSize = window.getComputedStyle(element).fontSize;
+            element.style.fontSize = (parseFloat(currentSize) + 2) + 'px';
+        }
+
+        function decreaseTextSize() {
+            const element = document.getElementById('timer-remaining');
+            const currentSize = window.getComputedStyle(element).fontSize;
+            element.style.fontSize = (parseFloat(currentSize) - 2) + 'px';
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
