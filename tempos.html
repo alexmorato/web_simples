@@ -5,38 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Temporizadores</title>
     <style>
+        @font-face {
+            font-family: "clockicons";
+            src: url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.eot");
+            src: url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.eot?#iefix") format("embedded-opentype"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff2") format("woff2"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff") format("woff"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.ttf") format("truetype"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.svg#clockicons") format("svg");
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
         }
+
         textarea {
             width: 80%;
             height: 150px;
             margin: 10px 0;
         }
+
         #timer-container {
             display: none;
             margin-top: 20px;
         }
+
         #timer-image {
             height: 40vh;
             width: auto;
         }
+
         .timer-info {
             margin: 10px 0;
             font-size: 18px;
         }
+
         .remaining-time {
             font-size: 24px;
             color: #d9534f;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'clockicons', monospace;
         }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
         }
+
         .controls {
             position: absolute;
             top: 10px;
@@ -44,6 +61,7 @@
             display: flex;
             gap: 5px;
         }
+
         .controls button {
             padding: 5px 10px;
             font-size: 12px;
@@ -58,7 +76,7 @@
     </div>
 
     <div id="input-container">
-    <h1>Configurador de Temporizadores</h1>
+        <h1>Configurador de Temporizadores</h1>
         <textarea id="json-input">[
 	{
 		"endTime": "08:00",
@@ -174,9 +192,9 @@
 
                     let timeString = "";
                     if (hours > 0) {
-                        timeString += `${hours}h `;
+                        timeString += `${hours}:`;
                     }
-                    timeString += `${minutes}m ${seconds}s`;
+                    timeString += `${minutes}:${seconds}`;
 
                     document.getElementById('timer-remaining').textContent = timeString;
                 }
