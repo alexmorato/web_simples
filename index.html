@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cronómetro</title>
     <style>
+        @font-face {
+            font-family: "clockicons";
+            src: url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.eot");
+            src: url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.eot?#iefix") format("embedded-opentype"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff2") format("woff2"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff") format("woff"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.ttf") format("truetype"),
+                 url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.svg#clockicons") format("svg");
+        }
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -14,13 +24,17 @@
             margin: 0;
             background-color: #f4f4f4;
         }
+
         .timer {
             text-align: center;
             color: #333;
         }
+
         .timer span {
-            font-size: 20vw;
+            font-size: 15vw;
+            font-family: 'ClockIcons', Arial, sans-serif;
         }
+
         button {
             padding: 10px 20px;
             font-size: 1rem;
@@ -32,9 +46,9 @@
     <div class="timer">
         <span id="stopwatch">00:00</span>
         <div>
-            <button onclick="startStopwatch()">Iniciar</button>
-            <button onclick="stopStopwatch()">Detener</button>
-            <button onclick="resetStopwatch()">Reiniciar</button>
+            <button onclick="startStopwatch()">START</button>
+            <button onclick="stopStopwatch()">STOP</button>
+            <button onclick="resetStopwatch()">RESET</button>
         </div>
     </div>
 
