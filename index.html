@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cronómetro v1</title>
+    <title>Cronómetro v2</title>
     <style>
         @font-face {
             font-family: "clockicons";
@@ -42,15 +42,6 @@
             cursor: pointer;
         }
 
-        .fullscreen-button {
-            position: absolute;
-            top: 10px;
-            right: 60px;
-            padding: 5px 10px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
         .resize-buttons {
             position: absolute;
             top: 10px;
@@ -78,7 +69,8 @@
     <div class="resize-buttons">
         <button onclick="increaseFontSize()">A+</button>
         <button onclick="decreaseFontSize()">A-</button>
-        <button class="fullscreen-button" onclick="toggleFullscreen()">⛶</button>
+        <button onclick="changeColors()">🎨</button>
+        <button onclick="toggleFullscreen()">⛶</button>
     </div>
     <div class="timer">
         <span id="stopwatch">00:00</span>
@@ -95,6 +87,7 @@
         let stopwatch;
         let elapsedTime = 0;
         let isRunning = false;
+        let wakeLock = null;
 
         function formatTime(seconds) {
             let hrs = Math.floor(seconds / 3600);
@@ -116,11 +109,14 @@
                 elapsedTime++;
                 stopwatchElement.textContent = formatTime(elapsedTime);
             }, 1000);
+
+            requestWakeLock();
         }
 
         function stopStopwatch() {
             clearInterval(stopwatch);
             isRunning = false;
+            releaseWakeLock();
         }
 
         function resetStopwatch() {
@@ -128,6 +124,7 @@
             isRunning = false;
             elapsedTime = 0;
             stopwatchElement.textContent = formatTime(elapsedTime);
+            releaseWakeLock();
         }
 
         function toggleFullscreen() {
@@ -148,6 +145,35 @@
         function decreaseFontSize() {
             const currentSize = parseFloat(window.getComputedStyle(stopwatchElement).fontSize);
             stopwatchElement.style.fontSize = `${currentSize * 0.9}px`;
+        }
+
+        function changeColors() {
+            const randomTextColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+            const randomBackgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+            stopwatchElement.style.color = randomTextColor;
+            document.body.style.backgroundColor = randomBackgroundColor;
+        }
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock activated');
+                }
+            } catch (err) {
+                console.error(`Wake Lock error: ${err.message}`);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release()
+                    .then(() => {
+                        wakeLock = null;
+                        console.log('Wake Lock released');
+                    });
+            }
         }
 
         // Inicializa el cronómetro
