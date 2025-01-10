@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronómetro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .timer {
+            text-align: center;
+            color: #333;
+        }
+        .timer span {
+            font-size: 20vw;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="timer">
+        <span id="stopwatch">00:00</span>
+        <div>
+            <button onclick="startStopwatch()">Iniciar</button>
+            <button onclick="stopStopwatch()">Detener</button>
+            <button onclick="resetStopwatch()">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        let stopwatchElement = document.getElementById('stopwatch');
+        let stopwatch;
+        let elapsedTime = 0;
+        let isRunning = false;
+
+        function formatTime(seconds) {
+            let hrs = Math.floor(seconds / 3600);
+            let mins = Math.floor((seconds % 3600) / 60);
+            let secs = seconds % 60;
+
+            if (hrs > 0) {
+                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            } else {
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function startStopwatch() {
+            if (isRunning) return;
+            isRunning = true;
+
+            stopwatch = setInterval(() => {
+                elapsedTime++;
+                stopwatchElement.textContent = formatTime(elapsedTime);
+            }, 1000);
+        }
+
+        function stopStopwatch() {
+            clearInterval(stopwatch);
+            isRunning = false;
+        }
+
+        function resetStopwatch() {
+            clearInterval(stopwatch);
+            isRunning = false;
+            elapsedTime = 0;
+            stopwatchElement.textContent = formatTime(elapsedTime);
+        }
+
+        // Inicializa el cronómetro
+        stopwatchElement.textContent = formatTime(elapsedTime);
+    </script>
+</body>
+</html>
