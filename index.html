@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cronómetro</title>
+    <title>Cronómetro v1</title>
     <style>
         @font-face {
             font-family: "clockicons";
@@ -23,6 +23,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f4f4f4;
+            position: relative;
         }
 
         .timer {
@@ -40,9 +41,45 @@
             font-size: 1rem;
             cursor: pointer;
         }
+
+        .fullscreen-button {
+            position: absolute;
+            top: 10px;
+            right: 60px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .resize-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .resize-buttons button {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .version {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: #888;
+        }
     </style>
 </head>
 <body>
+    <div class="resize-buttons">
+        <button onclick="increaseFontSize()">A+</button>
+        <button onclick="decreaseFontSize()">A-</button>
+        <button class="fullscreen-button" onclick="toggleFullscreen()">⛶</button>
+    </div>
     <div class="timer">
         <span id="stopwatch">00:00</span>
         <div>
@@ -51,6 +88,7 @@
             <button onclick="resetStopwatch()">RESET</button>
         </div>
     </div>
+    <div class="version">v1.0</div>
 
     <script>
         let stopwatchElement = document.getElementById('stopwatch');
@@ -90,6 +128,26 @@
             isRunning = false;
             elapsedTime = 0;
             stopwatchElement.textContent = formatTime(elapsedTime);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function increaseFontSize() {
+            const currentSize = parseFloat(window.getComputedStyle(stopwatchElement).fontSize);
+            stopwatchElement.style.fontSize = `${currentSize * 1.1}px`;
+        }
+
+        function decreaseFontSize() {
+            const currentSize = parseFloat(window.getComputedStyle(stopwatchElement).fontSize);
+            stopwatchElement.style.fontSize = `${currentSize * 0.9}px`;
         }
 
         // Inicializa el cronómetro
