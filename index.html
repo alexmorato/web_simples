@@ -108,7 +108,7 @@
         let stopwatchElement = document.getElementById('stopwatch');
         let timerdivElement = document.getElementById('timerdiv');
         let stopwatch;
-        let elapsedTime = 59;
+        let elapsedTime = 0;
         let isRunning = false;
         let wakeLock = null;
 
@@ -118,7 +118,7 @@
             let secs = seconds % 60;
 
             if (hrs > 0) {
-                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                return `${hrs.toString()}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             } else {
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
