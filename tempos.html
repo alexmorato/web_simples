@@ -33,13 +33,13 @@
         }
 
         #timer-image {
-            height: 40vh;
-            width: auto;
+            max-width: 90vw; /* Limita el ancho máximo al 90% del ancho de la ventana */
+            max-height: 40vh; /* Limita la altura máxima al 90% del alto de la ventana */
             border-radius: 15px; /* Borde redondeado */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            object-fit: contain; /* Escala la imagen manteniendo la proporción */
             transition: transform 0.3s; /* Transición suave */
         }
-
         .timer-info {
             margin: 10px 0;
             font-size: 28px;
@@ -100,6 +100,7 @@
     <div class="controls">
         <button onclick="increaseTextSize()">A+</button>
         <button onclick="decreaseTextSize()">A-</button>
+        <button onclick="cambiarFondo()">🎨</button>
         <button onclick="toggleFullScreen()">⛶</button>
     </div>
 
@@ -117,8 +118,8 @@
 		"imageUrl": "https://img.freepik.com/foto-gratis/muchacha-divertida-que-mira-vestido-rosado-encantador-tienda_7502-4254.jpg"
 	},
 	{
-		"endTime": "20:00",
-		"text": "💇 Peinarse 📱",
+		"endTime": "08:40",
+		"text": "💇 Peinarse 🪮",
 		"imageUrl": "https://img.freepik.com/fotos-premium/nina-feliz-peinandose-concepto-belleza-e-infancia-chica-sobre-fondo-rosa-aislado-peinando-su-cabello-peine-rosa-su-cabello-rubio_170532-3411.jpg"
 	}
 ]</textarea><br>
@@ -272,6 +273,19 @@
             element.style.fontSize = (parseFloat(currentSize) - 10) + 'px';
         }
 
+        function cambiarFondo() {
+            const colorAleatorio = generarColorClaro();
+            document.body.style.backgroundColor = colorAleatorio;
+        }
+
+        function generarColorClaro() {
+            // Genera un valor aleatorio para los colores (rojo, verde y azul) entre 200 y 255
+            const r = Math.floor(Math.random() * 56) + 200; // Valores entre 200 y 255
+            const g = Math.floor(Math.random() * 56) + 200; // Valores entre 200 y 255
+            const b = Math.floor(Math.random() * 56) + 200; // Valores entre 200 y 255
+            return `rgb(${r}, ${g}, ${b})`; // Devuelve el color en formato rgb
+        }
+        
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
