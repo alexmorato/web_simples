@@ -35,17 +35,23 @@
         #timer-image {
             height: 40vh;
             width: auto;
+            border-radius: 15px; /* Borde redondeado */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.3s; /* Transición suave */
         }
 
         .timer-info {
             margin: 10px 0;
-            font-size: 18px;
+            font-size: 28px;
         }
 
         .remaining-time {
             font-size: 24px;
             color: #d9534f;
             font-family: 'clockicons', monospace;
+            font-size: 10vh; /* Ajusta el tamaño según sea necesario */
+            text-align: center;
+            width: 100%;
         }
 
         button {
@@ -65,6 +71,28 @@
         .controls button {
             padding: 5px 10px;
             font-size: 12px;
+        }
+
+        #final-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: green;
+            text-align: center;
+            animation: fadeIn 3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -86,7 +114,7 @@
 	{
 		"endTime": "08:15",
 		"text": "👗 Vestirse 👟",
-		"imageUrl": "https://img.freepik.com/fotos-premium/conjunto-ropa-trajes-bebes-color-purpura-claro_1173099-17699.jpg"
+		"imageUrl": "https://img.freepik.com/foto-gratis/muchacha-divertida-que-mira-vestido-rosado-encantador-tienda_7502-4254.jpg"
 	},
 	{
 		"endTime": "20:00",
@@ -101,9 +129,14 @@
         <img id="timer-image" alt="Imagen del temporizador">
         <div class="timer-info" id="timer-text"></div>
         <div class="remaining-time" id="timer-remaining"></div>
-        <button onclick="skipTimer()">Acabe Antes</button>
+        <button onclick="skipTimerButtonClick()">Acabe Antes</button>
     </div>
 
+    <div id="final-message" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; font-weight: bold; color: green; text-align: center;">
+        No hay más temporizadores ⏰
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0"></script>
     <script>
         let timers = [];
         let currentTimerIndex = 0;
@@ -165,9 +198,10 @@
 
         function showTimer() {
             if (currentTimerIndex >= timers.length) {
-                alert('Todos los temporizadores han finalizado.');
-                releaseWakeLock(); // Liberar Wake Lock al finalizar
-                document.getElementById('timer-container').style.display = 'none';
+                // Mostrar mensaje final
+                document.getElementById('timer-container').style.display = 'none'; // Ocultar el temporizador
+                document.getElementById('final-message').style.display = 'block'; // Mostrar el mensaje
+                releaseWakeLock(); // Liberar el Wake Lock al finalizar
                 return;
             }
 
@@ -180,25 +214,33 @@
 
             clearInterval(countdownInterval);
             countdownInterval = setInterval(() => {
-                const remaining = calculateRemainingTime(timer.endTime);
+                const remainingTime = calculateRemainingTime(timer.endTime);
+                console.log(remainingTime);
 
-                if (remaining <= 0) {
+                if (remainingTime <= 1500) {
                     clearInterval(countdownInterval);
                     skipTimer();
                 } else {
-                    const seconds = Math.floor((remaining / 1000) % 60);
-                    const minutes = Math.floor((remaining / (1000 * 60)) % 60);
-                    const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-
-                    let timeString = "";
-                    if (hours > 0) {
-                        timeString += `${hours}:`;
-                    }
-                    timeString += `${minutes}:${seconds}`;
-
-                    document.getElementById('timer-remaining').textContent = timeString;
+                    updateTimerDisplay(remainingTime);
                 }
             }, 1000);
+        }
+
+        function formatTimeUnit(unit) {
+            return unit < 10 ? '0' + unit : unit;
+        }
+
+        function updateTimerDisplay(remainingTime) {
+            const seconds = Math.floor((remainingTime / 1000) % 60);
+            const minutes = Math.floor((remainingTime / (1000 * 60)) % 60);
+            const hours = Math.floor((remainingTime / (1000 * 60 * 60)) % 24);
+
+            let timeString = "";
+            if (hours > 0) {
+                timeString += `${hours}:`;
+            }
+            timeString += `${formatTimeUnit(minutes)}:${formatTimeUnit(seconds)}`;
+            document.getElementById('timer-remaining').textContent = timeString;
         }
 
         function skipTimer() {
@@ -207,16 +249,27 @@
             showTimer();
         }
 
+        function skipTimerButtonClick() {
+            // Efecto de confeti
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            skipTimer();
+        }
+
         function increaseTextSize() {
             const element = document.getElementById('timer-remaining');
             const currentSize = window.getComputedStyle(element).fontSize;
-            element.style.fontSize = (parseFloat(currentSize) + 2) + 'px';
+            element.style.fontSize = (parseFloat(currentSize) + 10) + 'px';
         }
 
         function decreaseTextSize() {
             const element = document.getElementById('timer-remaining');
             const currentSize = window.getComputedStyle(element).fontSize;
-            element.style.fontSize = (parseFloat(currentSize) - 2) + 'px';
+            element.style.fontSize = (parseFloat(currentSize) - 10) + 'px';
         }
 
         function toggleFullScreen() {
