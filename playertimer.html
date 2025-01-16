@@ -19,6 +19,7 @@
         .game {
             display: flex;
             height: 100vh;
+            position: relative;
         }
         .player {
             flex: 1;
@@ -33,10 +34,10 @@
             position: relative;
         }
         .player1 {
-            background-color: #56f648;
+            background-color: #f0f0f0;
         }
         .player2 {
-            background-color: #ea3d3d;
+            background-color: #d0f0d0;
         }
         .name {
             position: absolute;
@@ -68,38 +69,57 @@
             font-size: 1rem;
             cursor: pointer;
         }
+        .control-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            gap: 5px;
+        }
+        .control-buttons button {
+            background: none;
+            border: 1px solid black;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
 <div class="setup" id="setup">
-    <h1>Set Player Names and Times</h1>
+    <h1>Introdueix el nom i els temps dels jugadors</h1>
     <form id="setupForm">
         <label>
-            Player 1 Name:
+            Jugador 1 - NOM:
             <input type="text" id="player1Name" value="Player_1" required>
         </label>
         <br><br>
         <label>
-            Player 1 Time (seconds):
+            Jugador 1 - TEMPS (segons):
             <input type="number" id="player1Time" value="60" required>
         </label>
         <br><br>
         <label>
-            Player 2 Name:
+            Jugador 2 - NOM:
             <input type="text" id="player2Name" value="Player_2" required>
         </label>
         <br><br>
         <label>
-            Player 2 Time (seconds):
+            Jugador 2 - TEMPS (segons):
             <input type="number" id="player2Time" value="60" required>
         </label>
         <br><br>
-        <button type="submit">Start Game</button>
+        <button type="submit">que comenci el joc!</button>
     </form>
 </div>
 
 <div class="game" id="game" style="display: none;">
+    <div class="control-buttons">
+        <button onclick="toggleFullscreen()">⛶</button>
+        <button onclick="toggleColors()">🎨</button>
+    </div>
     <div class="player player1" id="player1">
         <div class="name" id="player1NameDisplay"></div>
         <div id="player1TimeDisplay"></div>
@@ -196,12 +216,35 @@
         clearInterval(timer);
         gameDiv.style.display = 'none';
         winnerDiv.style.display = 'flex';
-        winnerMessage.textContent = `🏆 ${winner} ha guanyat! 🏆`;
+        winnerMessage.textContent = `${winner} has won the game!`;
     }
 
     function restartGame() {
         winnerDiv.style.display = 'none';
         setupDiv.style.display = 'flex';
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    function toggleColors() {
+        function getRandomLightColor() {
+            const r = Math.floor(Math.random() * 128 + 128);
+            const g = Math.floor(Math.random() * 128 + 128);
+            const b = Math.floor(Math.random() * 128 + 128);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        const color1 = getRandomLightColor();
+        const color2 = getRandomLightColor();
+
+        player1Div.style.backgroundColor = color1;
+        player2Div.style.backgroundColor = color2;
     }
 
     player1Div.addEventListener('click', () => switchPlayer('player1'));
