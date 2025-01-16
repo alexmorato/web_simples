@@ -146,6 +146,50 @@
                 opacity: 0.3;
             }
         }
+        #pauseButton {
+            width: 160px; /* Diámetro del botón (2x radio) */
+            height: 160px;
+            border-radius: 80px; /* Hacerlo redondo (radio igual a la mitad del tamaño) */
+            background-color: #f0f0f0; /* Fondo gris claro */
+            border: 2px solid #000; /* Borde negro */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%; /* Centrado vertical */
+            left: 50%; /* Centrado horizontal */
+            transform: translate(-50%, -50%); /* Ajustar posición al centro */
+            z-index: 100; /* Encima de todo */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #pauseButton:active {
+            background-color: #ddd; /* Cambiar color al hacer clic */
+        }
+
+        /* Estilo para el símbolo de pausa */
+        #pauseButton::before,
+        #pauseButton::after {
+            content: '';
+            display: block;
+            width: 20px; /* Ancho de las barras del símbolo */
+            height: 50px; /* Altura de las barras */
+            background-color: #575757; /* Color negro */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+
+        #pauseButton::before {
+            margin-right: 10px; /* Separación de la barra izquierda */
+        }
+
+        #pauseButton::after {
+            margin-left: 10px; /* Separación de la barra derecha */
+        }
+
+        #pauseButton.paused {
+            border: 10px solid red; /* Borde rojo cuando está pausado */
+        }
 
     </style>
 </head>
@@ -182,7 +226,8 @@
     <div class="control-buttons">
         <button onclick="toggleFullscreen()">⛶</button>
         <button onclick="toggleColors()">🎨</button>
-    </div>
+    </div>    
+    <button id="pauseButton" onclick="togglePause()"></button> <!-- Botón de pausa separado -->
     <div class="player player1" id="player1">
         <div class="name" id="player1NameDisplay"></div>
         <div id="player1TimeDisplay"></div>
@@ -247,6 +292,8 @@
     });
 
     function switchPlayer(player) {
+        if (isPaused) return; // Si está pausado, no cambiar de jugador
+
         clearInterval(timer);
 
         // Elimina la clase activa de ambos jugadores
@@ -265,7 +312,7 @@
         timer = setInterval(() => {
             if (activePlayer === 'player1') {
                 player1Time--;
-                player1TimeDisplay.textContent = formatTime(player1Time); // Formatear tiempo a mm:ss
+                player1TimeDisplay.textContent = formatTime(player1Time);
                 player1TimeBar.style.width = `${(player1Time / player1InitialTime) * 100}%`;
 
                 if (player1Time <= 0) {
@@ -273,7 +320,7 @@
                 }
             } else if (activePlayer === 'player2') {
                 player2Time--;
-                player2TimeDisplay.textContent = formatTime(player2Time); // Formatear tiempo a mm:ss
+                player2TimeDisplay.textContent = formatTime(player2Time);
                 player2TimeBar.style.width = `${(player2Time / player2InitialTime) * 100}%`;
 
                 if (player2Time <= 0) {
@@ -396,9 +443,69 @@
         }
     }
 
+    let isPaused = false; // Bandera para saber si el juego está pausado
 
-    player1Div.addEventListener('click', () => switchPlayer('player1'));
-    player2Div.addEventListener('click', () => switchPlayer('player2'));
+    function togglePause() {
+        const pauseButton = document.getElementById('pauseButton');
+        if (isPaused) {
+            // Reanudar el juego
+            isPaused = false;
+            pauseButton.classList.remove('paused'); // Quitar borde rojo
+
+            // Cambiar el borde del jugador activo a rojo
+            if (activePlayer === 'player1') {
+                player1Div.classList.add('active');
+                player1Div.style.borderColor = 'red';
+            } else if (activePlayer === 'player2') {
+                player2Div.classList.add('active');
+                player2Div.style.borderColor = 'red';
+            }
+
+            // Reanudar el temporizador para el jugador activo
+            timer = setInterval(() => {
+                if (activePlayer === 'player1') {
+                    player1Time--;
+                    player1TimeDisplay.textContent = formatTime(player1Time);
+                    player1TimeBar.style.width = `${(player1Time / player1InitialTime) * 100}%`;
+
+                    if (player1Time <= 0) {
+                        endGame(player2NameDisplay.textContent);
+                    }
+                } else if (activePlayer === 'player2') {
+                    player2Time--;
+                    player2TimeDisplay.textContent = formatTime(player2Time);
+                    player2TimeBar.style.width = `${(player2Time / player2InitialTime) * 100}%`;
+
+                    if (player2Time <= 0) {
+                        endGame(player1NameDisplay.textContent);
+                    }
+                }
+            }, 1000);
+        } else {
+            // Pausar el juego
+            isPaused = true;
+
+            pauseButton.classList.add('paused'); // Añadir borde rojo
+            // Detener el temporizador
+            clearInterval(timer);
+
+            // Cambiar el borde del jugador activo a gris
+            if (activePlayer === 'player1') {
+                player1Div.style.borderColor = 'gray';
+            } else if (activePlayer === 'player2') {
+                player2Div.style.borderColor = 'gray';
+            }
+        }
+    }
+
+
+    player1Div.addEventListener('click', () => {
+        if (!isPaused) switchPlayer('player1');
+    });
+
+    player2Div.addEventListener('click', () => {
+        if (!isPaused) switchPlayer('player2');
+    });
 </script>
 
 </body>
