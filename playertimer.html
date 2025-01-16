@@ -40,9 +40,13 @@
             background-color: #d0f0d0;
         }
         .name {
-            position: absolute;
-            top: 20px;
-            font-size: 1.5rem;
+            position: static; /* Hacer que siga el flujo normal */
+            font-size: 2.5rem; /* Tamaño del texto más grande */
+            margin-bottom: 20px; /* Separación del tiempo */
+            text-align: center; /* Centrar el nombre */
+        }
+        .active {
+            border: 20px solid red; /* Borde rojo grande */
         }
         .time-bar {
             width: 80%;
@@ -83,6 +87,20 @@
             padding: 5px 10px;
             cursor: pointer;
             font-size: 0.9rem;
+        }
+        #setupForm button {
+            font-size: 2rem; /* Tamaño grande del texto */
+            padding: 20px 40px; /* Más espacio alrededor del texto */
+            background-color: #4CAF50; /* Color de fondo sólido */
+            color: white; /* Color del texto */
+            border: none; /* Sin bordes adicionales */
+            border-radius: 10px; /* Bordes redondeados */
+            cursor: pointer; /* Mantén el cursor de mano para indicar que es clicable */
+        }
+        #player1TimeDisplay,
+        #player2TimeDisplay {
+            font-size: 3rem; /* Aumentar el tamaño del tiempo restante */
+            font-weight: bold; /* Hacerlo más destacado */
         }
     </style>
 </head>
@@ -172,8 +190,8 @@
         player1NameDisplay.textContent = player1Name;
         player2NameDisplay.textContent = player2Name;
 
-        player1TimeDisplay.textContent = `${player1Time}s`;
-        player2TimeDisplay.textContent = `${player2Time}s`;
+        player1TimeDisplay.textContent = `${player1Time}`;
+        player2TimeDisplay.textContent = `${player2Time}`;
 
         player1TimeBar.style.width = '100%';
         player2TimeBar.style.width = '100%';
@@ -185,16 +203,23 @@
     function switchPlayer(player) {
         clearInterval(timer);
 
+        // Elimina la clase activa de ambos jugadores
+        player1Div.classList.remove('active');
+        player2Div.classList.remove('active');
+
+        // Cambia al siguiente jugador y aplica la clase activa
         if (player === 'player1') {
             activePlayer = 'player2';
+            player2Div.classList.add('active');
         } else {
             activePlayer = 'player1';
+            player1Div.classList.add('active');
         }
 
         timer = setInterval(() => {
             if (activePlayer === 'player1') {
                 player1Time--;
-                player1TimeDisplay.textContent = `${player1Time}s`;
+                player1TimeDisplay.textContent = `${player1Time}`;
                 player1TimeBar.style.width = `${(player1Time / player1InitialTime) * 100}%`;
 
                 if (player1Time <= 0) {
@@ -202,7 +227,7 @@
                 }
             } else if (activePlayer === 'player2') {
                 player2Time--;
-                player2TimeDisplay.textContent = `${player2Time}s`;
+                player2TimeDisplay.textContent = `${player2Time}`;
                 player2TimeBar.style.width = `${(player2Time / player2InitialTime) * 100}%`;
 
                 if (player2Time <= 0) {
@@ -220,8 +245,21 @@
     }
 
     function restartGame() {
+        // Ocultar la pantalla del ganador y mostrar la configuración inicial
         winnerDiv.style.display = 'none';
         setupDiv.style.display = 'flex';
+
+        // Reiniciar las clases de los jugadores (eliminar bordes rojos)
+        player1Div.classList.remove('active');
+        player2Div.classList.remove('active');
+
+        // Restablecer el tiempo inicial y otros valores
+        player1Time = player1InitialTime;
+        player2Time = player2InitialTime;
+        player1TimeDisplay.textContent = `${player1Time}s`;
+        player2TimeDisplay.textContent = `${player2Time}s`;
+        player1TimeBar.style.width = '100%';
+        player2TimeBar.style.width = '100%';
     }
 
     function toggleFullscreen() {
