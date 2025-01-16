@@ -60,12 +60,26 @@
             background-color: #76c7c0;
         }
         .winner {
-            display: none;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            font-size: 2rem;
+            font-size: 2rem; /* Tamaño base del texto */
+            text-align: center; /* Centrar el texto */
+            padding: 20px; /* Añadir margen interno para evitar tocar los bordes */
+            box-sizing: border-box; /* Incluir el padding en el ancho total */
+        }
+
+        #winnerMessage {
+            margin-bottom: 20px; /* Espaciado entre el mensaje y el botón */
+            line-height: 1.5; /* Separación entre líneas */
+        }
+
+        #winnerMessage span {
+            display: block; /* Asegurar que cada parte esté en su propia línea */
+            font-size: 2.5rem; /* Tamaño más grande para el nombre del ganador */
+            font-weight: bold; /* Destacar el nombre del jugador */
         }
         .winner button {
             margin-top: 20px;
@@ -102,6 +116,37 @@
             font-size: 3rem; /* Aumentar el tamaño del tiempo restante */
             font-weight: bold; /* Hacerlo más destacado */
         }
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none; /* Evita que interfiera con el clic en el botón */
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--confetti-color, #FFD700); /* Color por defecto (oro) */
+            opacity: 0.9;
+            transform: rotate(45deg);
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -155,6 +200,7 @@
 </div>
 
 <div class="winner" id="winner">
+    <div class="confetti-container" id="confettiContainer"></div> <!-- Contenedor para el confeti -->
     <div id="winnerMessage"></div>
     <button onclick="restartGame()">Restart</button>
 </div>
@@ -241,7 +287,15 @@
         clearInterval(timer);
         gameDiv.style.display = 'none';
         winnerDiv.style.display = 'flex';
-        winnerMessage.textContent = `${winner} has won the game!`;
+
+        // Mensaje del ganador con dos líneas
+        winnerMessage.innerHTML = `
+            <span>🏆 ${winner} 🏆</span>
+            Felicitats, has guanyat!
+        `;
+
+        // Activar confeti
+        generateConfetti();
     }
 
     function restartGame() {
@@ -284,6 +338,26 @@
         player1Div.style.backgroundColor = color1;
         player2Div.style.backgroundColor = color2;
     }
+
+    function generateConfetti() {
+        const confettiContainer = document.getElementById('confettiContainer');
+        confettiContainer.innerHTML = ''; // Limpia confeti anterior
+        const colors = ['#FFD700', '#FF4500', '#1E90FF', '#32CD32', '#FF69B4', '#8A2BE2'];
+
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            // Asignar posición inicial y propiedades aleatorias
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            confetti.style.animationDelay = `${Math.random() * 2}s`;
+            confetti.style.setProperty('--confetti-color', colors[Math.floor(Math.random() * colors.length)]);
+            
+            confettiContainer.appendChild(confetti);
+        }
+    }
+
 
     player1Div.addEventListener('click', () => switchPlayer('player1'));
     player2Div.addEventListener('click', () => switchPlayer('player2'));
