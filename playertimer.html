@@ -236,8 +236,8 @@
         player1NameDisplay.textContent = player1Name;
         player2NameDisplay.textContent = player2Name;
 
-        player1TimeDisplay.textContent = `${player1Time}`;
-        player2TimeDisplay.textContent = `${player2Time}`;
+        player1TimeDisplay.textContent = formatTime(player1Time); // Formatear tiempo inicial
+        player2TimeDisplay.textContent = formatTime(player2Time); // Formatear tiempo inicial
 
         player1TimeBar.style.width = '100%';
         player2TimeBar.style.width = '100%';
@@ -265,7 +265,7 @@
         timer = setInterval(() => {
             if (activePlayer === 'player1') {
                 player1Time--;
-                player1TimeDisplay.textContent = `${player1Time}`;
+                player1TimeDisplay.textContent = formatTime(player1Time); // Formatear tiempo a mm:ss
                 player1TimeBar.style.width = `${(player1Time / player1InitialTime) * 100}%`;
 
                 if (player1Time <= 0) {
@@ -273,7 +273,7 @@
                 }
             } else if (activePlayer === 'player2') {
                 player2Time--;
-                player2TimeDisplay.textContent = `${player2Time}`;
+                player2TimeDisplay.textContent = formatTime(player2Time); // Formatear tiempo a mm:ss
                 player2TimeBar.style.width = `${(player2Time / player2InitialTime) * 100}%`;
 
                 if (player2Time <= 0) {
@@ -318,9 +318,17 @@
 
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
+            document.documentElement.requestFullscreen().then(() => {
+                enableWakeLock(); // Activar Wake Lock al entrar en fullscreen
+            }).catch(err => {
+                console.error(`Error al entrar en pantalla completa: ${err}`);
+            });
         } else {
-            document.exitFullscreen();
+            document.exitFullscreen().then(() => {
+                disableWakeLock(); // Desactivar Wake Lock al salir de fullscreen
+            }).catch(err => {
+                console.error(`Error al salir de pantalla completa: ${err}`);
+            });
         }
     }
 
@@ -355,6 +363,36 @@
             confetti.style.setProperty('--confetti-color', colors[Math.floor(Math.random() * colors.length)]);
             
             confettiContainer.appendChild(confetti);
+        }
+    }
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60); // Calcula los minutos
+        const remainingSeconds = seconds % 60; // Calcula los segundos restantes
+        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`; // Formatea a mm:ss
+    }
+
+    let wakeLock = null;
+
+    async function enableWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake Lock activado');
+            } else {
+                console.log('La API de Wake Lock no es compatible con este navegador.');
+            }
+        } catch (err) {
+            console.error('Error al activar Wake Lock:', err);
+        }
+    }
+
+    function disableWakeLock() {
+        if (wakeLock) {
+            wakeLock.release().then(() => {
+                wakeLock = null;
+                console.log('Wake Lock desactivado');
+            });
         }
     }
 
