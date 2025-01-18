@@ -34,10 +34,10 @@
             position: relative;
         }
         .player1 {
-            background-color: #f041bb;
+            background-color: #ff75d6;
         }
         .player2 {
-            background-color: #eedf0f;
+            background-color: #88f8e9;
         }
         .name {
             position: static; /* Hacer que siga el flujo normal */
@@ -46,8 +46,27 @@
             text-align: center; /* Centrar el nombre */
         }
         .active {
-            border: 30px solid red; /* Borde rojo grande */
+            border: 40px solid red; /* Sin color sólido */
+            background: linear-gradient(90deg, rgb(225, 0, 255), orange, yellow, green); /* Degradado animado */
+            background-clip: padding-box; /* Aplicar el degradado al borde */
+            background-size: 300% 300%; /* Tamaño grande para animación fluida */
+            animation: gradient 2s infinite; /* Animación continua del degradado */
+            box-shadow: 0 0 20px red; /* Resplandor adicional */
+            transition: box-shadow 0.3s ease-in-out, background 0.3s ease-in-out; /* Transiciones suaves */
         }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%; /* Degradado al inicio */
+            }
+            50% {
+                background-position: 100% 50%; /* Degradado al final */
+            }
+            100% {
+                background-position: 0% 50%; /* Degradado regresa al inicio */
+            }
+        }
+
         .time-bar {
             width: 80%;
             height: 20px;
@@ -113,8 +132,7 @@
         }
         #player1TimeDisplay,
         #player2TimeDisplay {
-            font-size: 3rem; /* Aumentar el tamaño del tiempo restante */
-            font-weight: bold; /* Hacerlo más destacado */
+            font-size: 5rem; /* Aumentar el tamaño del tiempo restante */
         }
         .confetti-container {
             position: absolute;
