@@ -34,10 +34,10 @@
             position: relative;
         }
         .player1 {
-            background-color: #f0f0f0;
+            background-color: #f041bb;
         }
         .player2 {
-            background-color: #d0f0d0;
+            background-color: #eedf0f;
         }
         .name {
             position: static; /* Hacer que siga el flujo normal */
@@ -46,7 +46,7 @@
             text-align: center; /* Centrar el nombre */
         }
         .active {
-            border: 20px solid red; /* Borde rojo grande */
+            border: 30px solid red; /* Borde rojo grande */
         }
         .time-bar {
             width: 80%;
@@ -505,6 +505,16 @@
 
     player2Div.addEventListener('click', () => {
         if (!isPaused) switchPlayer('player2');
+    });
+
+    player1Div.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Evitar que el touchstart genere un click adicional
+        switchPlayer('player1');
+    });
+
+    player2Div.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        switchPlayer('player2');
     });
 </script>
 
