@@ -39,14 +39,19 @@
         .player2 {
             background-color: #88f8e9;
         }
+        #player1,
+        #player2 {
+            box-sizing: border-box; /* Incluir el borde dentro del tamaño del div */
+        }
+
         .name {
             position: static; /* Hacer que siga el flujo normal */
-            font-size: 2.5rem; /* Tamaño del texto más grande */
-            margin-bottom: 20px; /* Separación del tiempo */
+            font-size: 4vw; /* Tamaño del texto más grande */
+            margin-bottom: 60px; /* Separación del tiempo */
             text-align: center; /* Centrar el nombre */
         }
         .active {
-            border: 40px solid red; /* Sin color sólido */
+            border: 20px solid red; /* Sin color sólido */
             background: linear-gradient(90deg, rgb(225, 0, 255), orange, yellow, green); /* Degradado animado */
             background-clip: padding-box; /* Aplicar el degradado al borde */
             background-size: 300% 300%; /* Tamaño grande para animación fluida */
@@ -132,7 +137,7 @@
         }
         #player1TimeDisplay,
         #player2TimeDisplay {
-            font-size: 5rem; /* Aumentar el tamaño del tiempo restante */
+            font-size: 10vw; /* Aumentar el tamaño del tiempo restante */
         }
         .confetti-container {
             position: absolute;
@@ -431,10 +436,17 @@
         }
     }
 
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60); // Calcula los minutos
-        const remainingSeconds = seconds % 60; // Calcula los segundos restantes
-        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`; // Formatea a mm:ss
+    function formatTime(timeInSeconds) {
+        let minutes = Math.floor(timeInSeconds / 60);
+        let seconds = timeInSeconds % 60;
+
+        if (timeInSeconds < 60) {
+            // Mostrar solo segundos cuando el tiempo es menos de un minuto
+            return seconds.toString();
+        } else {
+            // Mostrar minutos y segundos
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
     }
 
     let wakeLock = null;
