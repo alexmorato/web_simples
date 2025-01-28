@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truco de Magia</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            cursor: pointer; /* Cambia el cursor para indicar que se puede hacer clic */
+        }
+
+        #bola {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 2s ease-in-out, left 1s linear, top 1s linear;
+            box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.5);
+            animation: glow 1.5s infinite alternate;
+        }
+
+        #bola::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent);
+            filter: blur(10px);
+            opacity: 0.7;
+        }
+
+        #bola.visible {
+            opacity: 1;
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 30px 35px rgba(255, 0, 0, 0.7);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="bola"></div>
+
+    <script>
+        const bola = document.getElementById('bola');
+        const velocidadBase = 700;
+        let velocidad = velocidadBase; // Velocidad inicial en píxeles por segundo
+        let intervaloVelocidad; // Para reducir la velocidad gradualmente
+        let enMovimiento = true; // Controla si la bola está en movimiento
+
+        // Función para hacer aparecer la bola con efecto fade-in
+        setTimeout(() => {
+            bola.classList.add('visible');
+        }, 100);
+
+        // Función para mover la bola a una posición aleatoria
+        function moverBola() {
+            if (!enMovimiento) return; // Si la bola está detenida, no hacer nada
+
+            const anchoVentana = window.innerWidth;
+            const altoVentana = window.innerHeight;
+
+            const nuevaX = Math.random() * (anchoVentana - bola.offsetWidth);
+            const nuevaY = Math.random() * (altoVentana - bola.offsetHeight);
+
+            const distanciaX = nuevaX - bola.offsetLeft;
+            const distanciaY = nuevaY - bola.offsetTop;
+
+            const distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
+            const tiempo = (distancia / velocidad) * 1000; // Tiempo en milisegundos
+
+            bola.style.transition = `left ${tiempo}ms linear, top ${tiempo}ms linear`;
+            bola.style.left = `${nuevaX}px`;
+            bola.style.top = `${nuevaY}px`;
+        }
+
+        // Función para reducir la velocidad gradualmente
+        function reducirVelocidad() {
+            if (velocidad > 0) {
+                velocidad -= 10; // Reduce la velocidad en 10 píxeles por segundo
+                if (velocidad < 0) velocidad = 0; // Asegurarse de que no sea negativa
+            } else {
+                clearInterval(intervaloVelocidad); // Detener el intervalo cuando la velocidad llega a 0
+                enMovimiento = false; // La bola ya no se mueve
+            }
+        }
+
+        // Función para cambiar el color de la bola
+        function cambiarColorBola() {
+            const colores = ['red'];
+            const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
+            bola.style.backgroundColor = colorAleatorio;
+        }
+
+        // Función para cambiar la velocidad de la bola de forma aleatoria
+        function cambiarVelocidadAleatoria() {
+            velocidad = Math.random() * 200 + 800; // Velocidad entre 100 y 500 píxeles/segundo
+        }
+
+        // Evento para iniciar el movimiento al hacer clic en la bola
+        bola.addEventListener('click', () => {
+            if (!enMovimiento) {
+                enMovimiento = true;
+                velocidad = velocidadBase; // Reiniciar la velocidad
+                moverBola();
+            }
+        });
+
+        // Evento para mover la bola automáticamente después de llegar a la posición anterior
+        bola.addEventListener('transitionend', () => {
+            if (enMovimiento) {
+                cambiarColorBola(); // Cambiar color después de cada movimiento
+                cambiarVelocidadAleatoria(); // Cambiar velocidad
+                moverBola();
+            }
+        });
+
+        // Evento para reducir la velocidad al hacer clic en el fondo (body)
+        document.body.addEventListener('click', (event) => {
+            if (event.target === document.body) { // Solo si se hace clic en el fondo
+                clearInterval(intervaloVelocidad); // Limpiar el intervalo anterior (si existe)
+                intervaloVelocidad = setInterval(reducirVelocidad, 200); // Reducir la velocidad cada 200ms
+            }
+        });
+
+        // Iniciar el movimiento inicial
+        moverBola();
+    </script>
+</body>
+</html>
