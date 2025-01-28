@@ -146,14 +146,17 @@
                 bola.classList.remove('visible'); // Hacer desaparecer la bola
             } else {
                 // Si la bola está quieta, moverla al punto donde se hizo clic
+                bola.style.transition = 'none'; // Desactivar transiciones
                 const x = event.clientX - bola.offsetWidth / 2;
                 const y = event.clientY - bola.offsetHeight / 2;
                 bola.style.left = `${x}px`;
                 bola.style.top = `${y}px`;
                 bola.classList.add('visible'); // Hacer aparecer la bola
+                setTimeout(() => {
+                    bola.style.transition = ''; // Restaurar transiciones
+                }, 3000);
             }
         });
-
 
         // Botón de pantalla completa
         btnFullscreen.addEventListener('click', () => {
