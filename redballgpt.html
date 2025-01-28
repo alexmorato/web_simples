@@ -84,7 +84,6 @@
     <div id="bola"></div>
     <div id="botones">
         <button id="fullscreen" class="boton">🌐</button>
-        <button id="reiniciar" class="boton">🔄</button>
     </div>
 
     <script>
@@ -166,19 +165,6 @@
             } else {
                 document.exitFullscreen();
             }
-        });
-
-        // Botón de reiniciar
-        btnReiniciar.addEventListener('click', () => {
-            enMovimiento = false; // Detener el movimiento
-            velocidad = velocidadBase; // Reiniciar velocidad
-            bola.style.transition = 'none'; // Eliminar transiciones para colocar la bola
-            bola.style.left = '50%';
-            bola.style.top = '50%';
-            bola.classList.add('visible'); // Asegurarse de que sea visible
-            setTimeout(() => {
-                bola.style.transition = ''; // Restaurar transiciones
-            });
         });
     </script>
 </body>
