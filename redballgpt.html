@@ -54,26 +54,55 @@
                 box-shadow: 0 0 30px 35px rgba(255, 0, 0, 0.7);
             }
         }
+
+        #botones {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .boton {
+            padding: 5px;
+            font-size: 16px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .boton:hover {
+            background-color: #666;
+        }
     </style>
 </head>
 <body>
     <div id="bola"></div>
+    <div id="botones">
+        <button id="fullscreen" class="boton">🌐</button>
+        <button id="reiniciar" class="boton">🔄</button>
+    </div>
 
     <script>
         const bola = document.getElementById('bola');
-        const velocidadBase = 700;
+        const btnFullscreen = document.getElementById('fullscreen');
+        const btnReiniciar = document.getElementById('reiniciar');
+        const velocidadBase = 900;
         let velocidad = velocidadBase; // Velocidad inicial en píxeles por segundo
-        let intervaloVelocidad; // Para reducir la velocidad gradualmente
-        let enMovimiento = true; // Controla si la bola está en movimiento
+        let intervaloVelocidad; // Intervalo para reducir la velocidad gradualmente
+        let enMovimiento = false; // Controla si la bola está en movimiento
 
-        // Función para hacer aparecer la bola con efecto fade-in
+        // Hacer aparecer la bola con efecto fade-in al cargar la página
         setTimeout(() => {
             bola.classList.add('visible');
         }, 100);
 
         // Función para mover la bola a una posición aleatoria
         function moverBola() {
-            if (!enMovimiento) return; // Si la bola está detenida, no hacer nada
+            if (!enMovimiento) return; // Si la bola no está activa, no hacer nada
 
             const anchoVentana = window.innerWidth;
             const altoVentana = window.innerHeight;
@@ -92,34 +121,10 @@
             bola.style.top = `${nuevaY}px`;
         }
 
-        // Función para reducir la velocidad gradualmente
-        function reducirVelocidad() {
-            if (velocidad > 0) {
-                velocidad -= 10; // Reduce la velocidad en 10 píxeles por segundo
-                if (velocidad < 0) velocidad = 0; // Asegurarse de que no sea negativa
-            } else {
-                clearInterval(intervaloVelocidad); // Detener el intervalo cuando la velocidad llega a 0
-                enMovimiento = false; // La bola ya no se mueve
-            }
-        }
-
-        // Función para cambiar el color de la bola
-        function cambiarColorBola() {
-            const colores = ['red'];
-            const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
-            bola.style.backgroundColor = colorAleatorio;
-        }
-
-        // Función para cambiar la velocidad de la bola de forma aleatoria
-        function cambiarVelocidadAleatoria() {
-            velocidad = Math.random() * 200 + 800; // Velocidad entre 100 y 500 píxeles/segundo
-        }
-
         // Evento para iniciar el movimiento al hacer clic en la bola
         bola.addEventListener('click', () => {
             if (!enMovimiento) {
-                enMovimiento = true;
-                velocidad = velocidadBase; // Reiniciar la velocidad
+                enMovimiento = true; // Activar el movimiento
                 moverBola();
             }
         });
@@ -127,22 +132,53 @@
         // Evento para mover la bola automáticamente después de llegar a la posición anterior
         bola.addEventListener('transitionend', () => {
             if (enMovimiento) {
-                cambiarColorBola(); // Cambiar color después de cada movimiento
-                cambiarVelocidadAleatoria(); // Cambiar velocidad
-                moverBola();
+                moverBola(); // Continuar el movimiento si está activo
             }
         });
 
-        // Evento para reducir la velocidad al hacer clic en el fondo (body)
+        // Evento para reducir la velocidad al hacer clic en el fondo
         document.body.addEventListener('click', (event) => {
             if (event.target === document.body) { // Solo si se hace clic en el fondo
-                clearInterval(intervaloVelocidad); // Limpiar el intervalo anterior (si existe)
-                intervaloVelocidad = setInterval(reducirVelocidad, 200); // Reducir la velocidad cada 200ms
+                clearInterval(intervaloVelocidad); // Limpiar el intervalo anterior
+                intervaloVelocidad = setInterval(() => {
+                    if (velocidad > 0) {
+                        velocidad -= 20; // Reducir la velocidad en 20 píxeles/segundo
+                        if (velocidad <= 0) {
+                            velocidad = 0; // Asegurarse de que no sea negativa
+                            enMovimiento = false; // Detener el movimiento
+                            clearInterval(intervaloVelocidad); // Detener el intervalo
+
+                            // Hacer desaparecer la bola después de 3 segundos
+                            setTimeout(() => {
+                                bola.classList.remove('visible');
+                            }, 3000);
+                        }
+                    }
+                }, 200); // Reducir la velocidad cada 200ms
             }
         });
 
-        // Iniciar el movimiento inicial
-        moverBola();
+        // Botón de pantalla completa
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Botón de reiniciar
+        btnReiniciar.addEventListener('click', () => {
+            enMovimiento = false; // Detener el movimiento
+            velocidad = velocidadBase; // Reiniciar velocidad
+            bola.style.transition = 'none'; // Eliminar transiciones para colocar la bola
+            bola.style.left = '50%';
+            bola.style.top = '50%';
+            bola.classList.add('visible'); // Asegurarse de que sea visible
+            setTimeout(() => {
+                bola.style.transition = ''; // Restaurar transiciones
+            });
+        });
     </script>
 </body>
 </html>
