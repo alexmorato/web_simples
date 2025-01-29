@@ -71,7 +71,7 @@ const positionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
 // Crear una malla de vértices para la bandera
-const segments = 50; // Número de subdivisiones a lo largo del eje X
+const segments = 100; // Número de subdivisiones a lo largo del eje X
 const positions = [];
 const texCoords = [];
 for (let i = 0; i <= segments; i++) {
@@ -141,7 +141,7 @@ function render() {
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, positions.length / 2);
     }
 
-    time += 0.01; // Incrementar el tiempo para animar la bandera
+    time += 0.13; // Incrementar el tiempo para animar la bandera
 
     requestAnimationFrame(render);
 }
