@@ -66,7 +66,7 @@ const positionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
 // Crear una malla de vértices para la bandera
-const segments = 50; // Número de subdivisiones a lo largo del eje X
+const segments = 100; // Número de subdivisiones a lo largo del eje X
 const positions = [];
 for (let i = 0; i <= segments; i++) {
     const x = -0.5 + (i / segments) * 1.0; // Coordenada X entre -0.5 y 0.5
@@ -82,16 +82,26 @@ gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 // Obtener la ubicación de la variable uniforme de tiempo
 const timeUniformLocation = gl.getUniformLocation(program, 'u_time');
 
+// Variable para controlar la visibilidad del rectángulo
+let isVisible = true;
+
+// Evento de clic para alternar la visibilidad
+canvas.addEventListener('click', () => {
+    isVisible = !isVisible; // Alternar visibilidad
+});
+
 // Función de renderizado
 let time = 0;
 function render() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.uniform1f(timeUniformLocation, time);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, positions.length / 2);
+    if (isVisible) {
+        gl.uniform1f(timeUniformLocation, time);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, positions.length / 2);
+    }
 
-    time += 0.06; // Incrementar el tiempo para animar la bandera
+    time += 0.13; // Incrementar el tiempo para animar la bandera
 
     requestAnimationFrame(render);
 }
