@@ -110,7 +110,7 @@ gl.bindTexture(gl.TEXTURE_2D, texture);
 
 // Cargar una imagen como textura
 const image = new Image();
-image.src = './telaroja.jpg'; // Cambia 'texture.jpg' por la ruta de tu imagen
+image.src = './texturaroja.jpg'; // Cambia 'texture.jpg' por la ruta de tu imagen
 image.onload = () => {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
