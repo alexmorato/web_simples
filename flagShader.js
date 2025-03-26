@@ -123,7 +123,7 @@ image.onload = () => {
 };
 
 // Variable para controlar la visibilidad del rectángulo
-let isVisible = true;
+let isVisible = false;
 
 // Evento de clic para alternar la visibilidad
 canvas.addEventListener('click', () => {
