@@ -11,8 +11,8 @@
             height: 100%;
             overflow: hidden;
             background-color: #000;
-            user-select: none; /* Desactivar la selección de texto */
-            -webkit-tap-highlight-color: transparent; /* Evitar el efecto de resaltado azul en dispositivos táctiles */
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #bola {
@@ -62,10 +62,11 @@
             right: 10px;
             display: flex;
             gap: 5px;
+            z-index: 1000;
         }
 
         .boton {
-            padding: 5px;
+            padding: 15px; /* Aumentar el relleno para agrandar el botón */
             font-size: 16px;
             background-color: #444;
             color: #fff;
@@ -89,19 +90,16 @@
     <script>
         const bola = document.getElementById('bola');
         const btnFullscreen = document.getElementById('fullscreen');
-        const btnReiniciar = document.getElementById('reiniciar');
-        const velocidadBase = 1300;
-        let velocidad = velocidadBase; // Velocidad inicial en píxeles por segundo
-        let enMovimiento = false; // Controla si la bola está en movimiento
+        const velocidadBase = 1600;
+        let velocidad = velocidadBase;
+        let enMovimiento = false;
 
-        // Hacer aparecer la bola con efecto fade-in al cargar la página
         setTimeout(() => {
             bola.classList.add('visible');
         }, 100);
 
-        // Función para mover la bola a una posición aleatoria
         function moverBola() {
-            if (!enMovimiento) return; // Si la bola no está activa, no hacer nada
+            if (!enMovimiento) return;
 
             const anchoVentana = window.innerWidth;
             const altoVentana = window.innerHeight;
@@ -113,53 +111,51 @@
             const distanciaY = nuevaY - bola.offsetTop;
 
             const distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
-            const tiempo = (distancia / velocidad) * 1000; // Tiempo en milisegundos
+            const tiempo = (distancia / velocidad) * 1000;
 
             bola.style.transition = `left ${tiempo}ms linear, top ${tiempo}ms linear`;
             bola.style.left = `${nuevaX}px`;
             bola.style.top = `${nuevaY}px`;
         }
 
-        // Evento para iniciar el movimiento al hacer clic en la bola
         bola.addEventListener('click', (event) => {
-            event.stopPropagation(); // Evitar que el clic en la bola se propague al body
+            event.stopPropagation();
             if (!enMovimiento) {
-                enMovimiento = true; // Activar el movimiento
+                enMovimiento = true;
                 moverBola();
             } else {
-                enMovimiento = false; // Detener el movimiento
-                bola.classList.remove('visible'); // Hacer desaparecer la bola
+                enMovimiento = false;
+                bola.classList.remove('visible');
             }
         });
 
-        // Evento para mover la bola automáticamente después de llegar a la posición anterior
         bola.addEventListener('transitionend', () => {
             if (enMovimiento) {
-                moverBola(); // Continuar el movimiento si está activo
+                moverBola();
             }
         });
 
-        // Evento para detener el movimiento y hacer desaparecer la bola al hacer clic en el fondo
         document.body.addEventListener('click', (event) => {
-            if (enMovimiento) {
-                enMovimiento = false; // Detener el movimiento
-                bola.classList.remove('visible'); // Hacer desaparecer la bola
-            } else {
-                // Si la bola está quieta, moverla al punto donde se hizo clic
-                bola.style.transition = 'none'; // Desactivar transiciones
-                const x = event.clientX - bola.offsetWidth / 2;
-                const y = event.clientY - bola.offsetHeight / 2;
-                bola.style.left = `${x}px`;
-                bola.style.top = `${y}px`;
-                bola.classList.add('visible'); // Hacer aparecer la bola
-                setTimeout(() => {
-                    bola.style.transition = ''; // Restaurar transiciones
-                }, 3000);
+            if (event.target !== btnFullscreen) {
+                if (enMovimiento) {
+                    enMovimiento = false;
+                    bola.classList.remove('visible');
+                } else {
+                    bola.style.transition = 'none';
+                    const x = event.clientX - bola.offsetWidth / 2;
+                    const y = event.clientY - bola.offsetHeight / 2;
+                    bola.style.left = `${x}px`;
+                    bola.style.top = `${y}px`;
+                    bola.classList.add('visible');
+                    setTimeout(() => {
+                        bola.style.transition = '';
+                    }, 3000);
+                }
             }
         });
 
-        // Botón de pantalla completa
-        btnFullscreen.addEventListener('click', () => {
+        btnFullscreen.addEventListener('click', (event) => {
+            event.stopPropagation();
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
             } else {
