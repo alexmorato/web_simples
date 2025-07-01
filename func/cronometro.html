@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
+  <title>Cuenta atrás y cronómetro</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #display {
+      font-size: 6rem;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    #controlButton {
+      font-size: 2rem;
+      padding: 20px 40px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #controlButton.paused {
+      background-color: #dc3545;
+    }
+
+    #controlButton:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="display">10</div>
+  <button id="controlButton" style="display: none;">Pausa</button>
+
+  <script>
+    let display = document.getElementById('display');
+    let controlButton = document.getElementById('controlButton');
+
+    // Estado del cronómetro
+    let countdown = 10;
+    let timer = null;
+    let centiseconds = 0;
+    let seconds = 0;
+    let running = true;
+
+    // Empezar la cuenta regresiva
+    function startCountdown() {
+      display.textContent = countdown;
+      timer = setInterval(() => {
+        countdown--;
+        display.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          startChronometer();
+        }
+      }, 1000);
+    }
+
+    function startChronometer() {
+      display.textContent = "0:00";
+      controlButton.style.display = "block";
+      running = true;
+      timer = setInterval(updateChronometer, 10);
+    }
+
+    function updateChronometer() {
+      if (!running) return;
+      centiseconds++;
+      if (centiseconds >= 100) {
+        centiseconds = 0;
+        seconds++;
+      }
+      display.textContent = `${seconds}:${centiseconds.toString().padStart(2, '0')}`;
+    }
+
+    controlButton.addEventListener('click', () => {
+      running = !running;
+      controlButton.textContent = running ? "Pausa" : "Reanudar";
+      controlButton.classList.toggle('paused', !running);
+    });
+
+    // Iniciar al cargar
+    window.onload = () => {
+      startCountdown();
+    };
+  </script>
+
+</body>
+</html>
