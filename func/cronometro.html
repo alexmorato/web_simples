@@ -23,7 +23,7 @@
       margin-bottom: 40px;
     }
 
-    #controlButton {
+    .bigButton {
       font-size: 2rem;
       padding: 20px 40px;
       background-color: #28a745;
@@ -34,33 +34,60 @@
       transition: background-color 0.3s;
     }
 
-    #controlButton.paused {
+    .bigButton.paused {
       background-color: #dc3545;
     }
 
-    #controlButton:active {
+    .bigButton:active {
       transform: scale(0.98);
     }
   </style>
 </head>
 <body>
 
-  <div id="display">10</div>
-  <button id="controlButton" style="display: none;">Pausa</button>
+  <div id="display">Pulsa para empezar</div>
+  <button id="startButton" class="bigButton">Iniciar</button>
+  <button id="controlButton" class="bigButton" style="display: none;">Pausa</button>
 
   <script>
     let display = document.getElementById('display');
+    let startButton = document.getElementById('startButton');
     let controlButton = document.getElementById('controlButton');
 
-    // Estado del cronómetro
     let countdown = 10;
     let timer = null;
     let centiseconds = 0;
     let seconds = 0;
     let running = true;
+    let wakeLock = null;
 
-    // Empezar la cuenta regresiva
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log('Wake Lock activo');
+          wakeLock.addEventListener('release', () => {
+            console.log('Wake Lock liberado');
+          });
+        } catch (err) {
+          console.error(`${err.name}, ${err.message}`);
+        }
+      } else {
+        console.log('Wake Lock API no soportada');
+      }
+    }
+
+    async function releaseWakeLock() {
+      if (wakeLock !== null) {
+        await wakeLock.release();
+        wakeLock = null;
+        console.log('Wake Lock liberado manualmente');
+      }
+    }
+
     function startCountdown() {
+      startButton.style.display = "none";
+      countdown = 10;
       display.textContent = countdown;
       timer = setInterval(() => {
         countdown--;
@@ -76,7 +103,10 @@
       display.textContent = "0:00";
       controlButton.style.display = "block";
       running = true;
+      centiseconds = 0;
+      seconds = 0;
       timer = setInterval(updateChronometer, 10);
+      requestWakeLock();
     }
 
     function updateChronometer() {
@@ -95,10 +125,9 @@
       controlButton.classList.toggle('paused', !running);
     });
 
-    // Iniciar al cargar
-    window.onload = () => {
+    startButton.addEventListener('click', () => {
       startCountdown();
-    };
+    });
   </script>
 
 </body>
