@@ -49,6 +49,21 @@
       border: none;
       border-radius: 5px;
     }
+    #player {
+      width: 100%;
+      height: 400px;
+      pointer-events: none;
+    }
+    #custom-controls {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    #custom-controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -61,30 +76,31 @@
 
   <div id="player-view">
     <h1 id="songTitle"></h1>
-    <iframe id="youtubePlayer" width="100%" height="400" src="" frameborder="0" allowfullscreen></iframe>
-    <br />
+    <div id="player"></div>
+    <div id="custom-controls">
+      <button onclick="playVideo()">▶️ Reproducir</button>
+      <button onclick="pauseVideo()">⏸️ Pausar</button>
+    </div>
     <button id="back-btn">🔙 Volver</button>
   </div>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    let songs = [];
-
-    fetch("songs.json")
-      .then(res => res.json())
-      .then(data => {
-        songs = data;
-        renderSongs(); // llama al render una vez se cargan
-      })
-      .catch(err => {
-        console.error("Error cargando canciones:", err);
-      });
+    const songs = [
+      { title: "Un beso y una flor - Nino Bravo", youtubeId: "MUAjTGceHAM" },
+      { title: "Sueltalo, Frozen - Gisela", youtubeId: "bFdAy-DAkEo" },
+      { title: "Volcans - Buhos", youtubeId: "PKt5inkhMjM" },
+      { title: "Caminem lluny - Doctor Prats", youtubeId: "T0GdzgDq5Z4" }
+    ];
 
     const songListEl = document.getElementById("songList");
     const searchInput = document.getElementById("search");
     const menuView = document.getElementById("menu-view");
     const playerView = document.getElementById("player-view");
-    const youtubePlayer = document.getElementById("youtubePlayer");
     const songTitle = document.getElementById("songTitle");
+
+    let player;
+    let currentVideoId = "";
 
     function renderSongs(filter = "") {
       songListEl.innerHTML = "";
@@ -102,12 +118,15 @@
       menuView.style.display = "none";
       playerView.style.display = "block";
       songTitle.textContent = song.title;
-      //youtubePlayer.src = `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1`;
-      youtubePlayer.src = `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1&disablekb=1`;
+      currentVideoId = song.youtubeId;
+
+      if (player) {
+        player.loadVideoById(song.youtubeId);
+      }
     }
 
     document.getElementById("back-btn").onclick = () => {
-      youtubePlayer.src = "";
+      if (player) player.stopVideo();
       playerView.style.display = "none";
       menuView.style.display = "block";
     };
@@ -115,6 +134,29 @@
     searchInput.oninput = (e) => {
       renderSongs(e.target.value);
     };
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '400',
+        width: '100%',
+        videoId: '',
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          disablekb: 1
+        }
+      });
+    }
+
+    function playVideo() {
+      if (player) player.playVideo();
+    }
+
+    function pauseVideo() {
+      if (player) player.pauseVideo();
+    }
 
     // Inicial
     renderSongs();
